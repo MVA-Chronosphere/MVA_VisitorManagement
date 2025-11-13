@@ -155,6 +155,7 @@ export default function AddVisitorScreen({ navigation }) {
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={styles.card}>
           <Text style={styles.header}>Visitor Management System</Text>
