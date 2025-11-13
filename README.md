@@ -162,7 +162,3 @@ Push notifications for mobile hosts
 Harsha Vardan
 💼 Full-stack Developer (Node.js + Kotlin + React Native)
 📧 Contact via Signal
-
-🛡 License
-
-This project is open source under the MIT License — free to use, modify, and distribute.
