@@ -29,10 +29,9 @@ export default function AddVisitorScreen({ navigation }) {
   const [successModalVisible, setSuccessModalVisible] = useState(false);
   const [cardUrl, setCardUrl] = useState(null);
   const [visitorId, setVisitorId] = useState(null);
-  const [notifyStatus, setNotifyStatus] = useState(null); // ✅ New state for notify feedback
+  const [notifyStatus, setNotifyStatus] = useState(null);
   const [notifying, setNotifying] = useState(false);
 
-  // ✅ Department Options
   const departmentOptions = [
     { label: "Front Office & Vision Paradise", value: "Front Office & Vision Paradise" },
     { label: "Vision Petals", value: "Vision Petals" },
@@ -49,7 +48,6 @@ export default function AddVisitorScreen({ navigation }) {
     { label: "Josh Club", value: "Josh Club" },
   ];
 
-  // ✅ Camera
   const openCamera = async () => {
     try {
       if (Platform.OS === "web") {
@@ -91,7 +89,6 @@ export default function AddVisitorScreen({ navigation }) {
     }
   };
 
-  // ✅ Submit Visitor
   const handleSubmit = async () => {
     if (!name || !reason || !photo || !department) {
       Alert.alert("Missing Info", "Please fill in all required fields and take a photo.");
@@ -112,7 +109,7 @@ export default function AddVisitorScreen({ navigation }) {
 
       if (response.data.success) {
         setCardUrl(response.data.cardUrl);
-        setVisitorId(response.data.visitorId); // ✅ store visitor ID
+        setVisitorId(response.data.visitorId);
         setSuccessModalVisible(true);
         setNotifyStatus(null);
       } else {
@@ -125,39 +122,40 @@ export default function AddVisitorScreen({ navigation }) {
     }
   };
 
-  // ✅ Notify Host — calls backend API and shows status
   const handleNotify = async () => {
-  if (!visitorId) {
-    Alert.alert("Error", "No visitor ID found.");
-    return;
-  }
-
-  try {
-    setLoading(true);
-    const response = await apiClient.post("/notify", {
-      id: visitorId,
-      phoneNumber: "+919944774474", // optional; can be omitted
-    });
-    setLoading(false);
-
-    if (response.data.success) {
-      Alert.alert("Success", "Host notified successfully!");
-    } else {
-      Alert.alert("Error", "Failed to notify host.");
+    if (!visitorId) {
+      Alert.alert("Error", "No visitor ID found.");
+      return;
     }
-  } catch (error) {
-    console.error("Notify Error:", error);
-    setLoading(false);
-    Alert.alert("Error", "Failed to send notification.");
-  }
-};
 
+    try {
+      setLoading(true);
+      const response = await apiClient.post("/notify", {
+        id: visitorId,
+        phoneNumber: "+919944774474",
+      });
+      setLoading(false);
+
+      if (response.data.success) {
+        Alert.alert("Success", "Host notified successfully!");
+      } else {
+        Alert.alert("Error", "Failed to notify host.");
+      }
+    } catch (error) {
+      console.error("Notify Error:", error);
+      setLoading(false);
+      Alert.alert("Error", "Failed to send notification.");
+    }
+  };
 
   const handleViewCard = () => cardUrl && Linking.openURL(cardUrl);
 
   return (
     <LinearGradient colors={["#f0f4f8", "#d9e2ec"]} style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.card}>
           <Text style={styles.header}>Visitor Management System</Text>
 
@@ -167,6 +165,7 @@ export default function AddVisitorScreen({ navigation }) {
             value={name}
             onChangeText={setName}
           />
+
           <TextInput
             style={styles.input}
             placeholder="Reason for Visit"
@@ -174,13 +173,11 @@ export default function AddVisitorScreen({ navigation }) {
             onChangeText={setReason}
           />
 
-          {/* ✅ Department Dropdown */}
           <View style={styles.input}>
             <ModalSelector
               data={departmentOptions.map((d, i) => ({ key: i, label: d.label, value: d.value }))}
               initValue="Select Venue"
               onChange={(option) => setDepartment(option.value)}
-              style={{ borderRadius: 10 }}
               selectStyle={{
                 borderWidth: 0,
                 borderRadius: 10,
@@ -192,23 +189,9 @@ export default function AddVisitorScreen({ navigation }) {
                 fontSize: 16,
                 color: department ? "#333" : "#777",
               }}
-              optionContainerStyle={{
-                borderRadius: 10,
-                backgroundColor: "#fff",
-                shadowColor: "#000",
-                shadowOpacity: 0.15,
-                shadowOffset: { width: 0, height: 2 },
-                shadowRadius: 5,
-                elevation: 4,
-              }}
-              optionTextStyle={{
-                fontSize: 16,
-                color: "#333",
-              }}
-              cancelText="Cancel"
             >
               <Text style={{ fontSize: 16, color: department ? "#333" : "#777" }}>
-                {department ? department : "Select Venue"}
+                {department || "Select Venue"}
               </Text>
             </ModalSelector>
           </View>
@@ -220,6 +203,7 @@ export default function AddVisitorScreen({ navigation }) {
             onChangeText={setDescription}
             multiline
           />
+
           <TextInput
             style={styles.input}
             placeholder="Host Email (optional)"
@@ -255,7 +239,6 @@ export default function AddVisitorScreen({ navigation }) {
         </View>
       </ScrollView>
 
-      {/* ✅ Success Modal */}
       <Modal transparent visible={successModalVisible} animationType="fade">
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
@@ -263,37 +246,16 @@ export default function AddVisitorScreen({ navigation }) {
               source={{ uri: "https://cdn-icons-png.flaticon.com/512/845/845646.png" }}
               style={{ width: 70, height: 70, marginBottom: 15 }}
             />
+
             <Text style={styles.successText}>Visitor Added Successfully!</Text>
 
             <TouchableOpacity style={styles.viewButton} onPress={handleViewCard}>
               <Text style={styles.viewButtonText}>View ID Card</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.downloadButton}
-              onPress={handleNotify}
-              disabled={notifying}
-            >
-              {notifying ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.downloadButtonText}>Notify Host</Text>
-              )}
+            <TouchableOpacity style={styles.downloadButton} onPress={handleNotify}>
+              <Text style={styles.downloadButtonText}>Notify Host</Text>
             </TouchableOpacity>
-
-            {/* ✅ Notify Status Message */}
-            {notifyStatus && (
-              <Text
-                style={{
-                  color: notifyStatus.startsWith("✅") ? "green" : "red",
-                  fontWeight: "600",
-                  textAlign: "center",
-                  marginTop: 10,
-                }}
-              >
-                {notifyStatus}
-              </Text>
-            )}
 
             <TouchableOpacity
               onPress={() => {
@@ -321,10 +283,8 @@ export default function AddVisitorScreen({ navigation }) {
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
     paddingVertical: 30,
-    backgroundColor: "#f0f4f8", // Light background for the whole screen
+    alignItems: "center", // ← keeps card centered but allows scrolling
   },
   card: {
     backgroundColor: "#ffffff",
@@ -341,7 +301,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#2c3e50", // Darker, more professional color
+    color: "#2c3e50",
     textAlign: "center",
     marginBottom: 30,
   },
@@ -377,9 +337,9 @@ const styles = StyleSheet.create({
   preview: {
     width: 200,
     height: 200,
-    borderRadius: 100, // Circular image
+    borderRadius: 100,
     borderWidth: 4,
-    borderColor: "#3498db", // A vibrant blue
+    borderColor: "#3498db",
     marginVertical: 25,
     alignSelf: "center",
   },
@@ -406,15 +366,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "85%",
     maxWidth: 380,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.15,
-    shadowRadius: 15,
-    elevation: 10,
   },
   successText: {
     fontSize: 22,
-    color: "#27ae60", // A pleasant green
+    color: "#27ae60",
     fontWeight: "bold",
     marginBottom: 25,
     textAlign: "center",
@@ -433,7 +388,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   downloadButton: {
-    backgroundColor: "#f39c12", // A warm orange for notify
+    backgroundColor: "#f39c12",
     paddingVertical: 12,
     borderRadius: 10,
     width: "80%",
@@ -450,7 +405,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   closeText: {
-    color: "#e74c3c", // A strong red for close
+    color: "#e74c3c",
     fontWeight: "600",
     fontSize: 16,
   },
