@@ -1,9 +1,11 @@
 {
   "name": "visitor-management-backend",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "dist/app.js",
   "scripts": {
-    "dev": "ts-node-dev src/index.ts"
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "ts-node-dev --respawn --transpileOnly src/app.ts"
   },
   "dependencies": {
     "axios": "^1.6.8",
